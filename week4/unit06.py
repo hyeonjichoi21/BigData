@@ -142,7 +142,7 @@ plt.hist(aug, bins = 100, color = 'r')
 plt.show()
 
 
-# In[13]:
+# In[13]: 1월과 8월의 최고 기온 데이터 히스토그램으로 표현하기 
 
 
 import csv
@@ -237,7 +237,7 @@ plt.boxplot(jan)
 plt.show()
 
 
-# In[17]:
+# In[17]: 1월과 8월의 최고 기온 데이터 상자 그림으로 표현하기 
 
 
 # 8월, 1월 최고기온 boxplot

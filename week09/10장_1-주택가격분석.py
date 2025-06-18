@@ -31,6 +31,8 @@ boston_df = pd.DataFrame(boston.data, columns = boston.feature_names)
 boston_df.head()
 
 # In[4]:
+# boston.target = 실제 정답값. 단순 정답값 벡터
+# 종속 변수인 주택 가격('PRICE')을 boston_df에 추가
 boston_df['PRICE'] = boston.target
 boston_df.head()
 boston_df.to_csv("./DATA/BostonHousing.csv", index=False)
@@ -49,8 +51,8 @@ from sklearn.metrics import mean_squared_error, r2_score
 
 # In[10]:
 # X, Y 분할하기
-Y = boston_df['PRICE']
-X = boston_df.drop(['PRICE'], axis=1, inplace=False)
+Y = boston_df['PRICE'] # 종속변수 Y !!
+X = boston_df.drop(['PRICE'], axis=1, inplace=False) # 나머지 모두 독립변수 X !!
 
 # In[10]:
 # 훈련용 데이터와 평가용 데이터 분할하기
@@ -81,8 +83,10 @@ print('Y 절편 값: ', lr.intercept_)
 print('회귀 계수 값: ', np.round(lr.coef_, 1))
 
 # In[16]:
+# 피처의 영향을 분석
 coef = pd.Series(data = np.round(lr.coef_, 2), index=X.columns)
-coef.sort_values(ascending = False)
+# 칼럼 별 피처 영향값들을 내림차순 정렬
+coef.sort_values(ascending = False) 
 
 # ## - 회귀 분석 결과를 산점도 + 선형 회귀 그래프로 시각화하기
 # In[17]:
@@ -98,3 +102,4 @@ for i, feature in enumerate(x_features):
       col = i%3
       sns.regplot(x=feature, y='PRICE', data=boston_df, ax=axs[row][col])
 
+plt.show()

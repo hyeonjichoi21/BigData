@@ -18,9 +18,9 @@ for row in data :
 import csv
 f = open('seoul.csv')
 data = csv.reader(f)
-next(data)
+next(data) # 헤더 다음으로 바꾸고
 for row in data :
-    print(row[-1])
+    print(row[-1]) # 기온 데이터만 모두 출력. -1 에 기온데이터 있나봄
 
 
 # In[3]:
@@ -101,7 +101,7 @@ result = []
 
 for row in data :
     if row[-1] != '' : # 결측치  (null값)
-        if row[0].split('-')[1] == '08' :
+        if row[0].split('-')[1] == '08' : # 8월에 해당하는 값이라면 
             result.append(float(row[-1]))
 
 print(len(result)) # 전체 데이터 개수

@@ -27,7 +27,7 @@ from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test=train_test_split(X, Y, test_size=0.3, random_state=10)
 
 # DecisionTreeClassifier
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier # 이진 분류 ~ 
 model=DecisionTreeClassifier()
 model.fit(x_train, y_train)
 y_test_predicted=model.predict(x_test)
@@ -52,7 +52,7 @@ print(accuracy_score(y_test, y_test_predicted))
 print(precision_score(y_test, y_test_predicted))
 print(recall_score(y_test, y_test_predicted))
 
-# LogisticRegression
+# LogisticRegression (이진 분류는 LogisticRegresssion 도 ㄱㅊ)
 from sklearn.linear_model import LogisticRegression
 model=LogisticRegression(max_iter=1000) # lbfgs failed to converge
 model.fit(x_train, y_train)
@@ -71,10 +71,18 @@ print('****', model.predict_proba(x_test))
 # 결과
 print(y_test_predicted)
 result=pd.DataFrame(y_test_predicted)
-result.to_csv('result.csv', index=False)
+result.to_csv('result.csv', index=False) # index=False 인덱스는 필요없다는 의미
       
 # 기타 분류 알고리즘
 # SVM, KNN, MLPClassifier
+
+
+
+
+
+import pandas as pd
+data=pd.read_csv("mtcars.csv")
+print(data)
 
 
 

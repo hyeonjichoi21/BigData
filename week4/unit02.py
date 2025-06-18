@@ -9,11 +9,11 @@ import csv
 f = open('seoul.csv', 'r', encoding='cp949') 
 data = csv.reader(f, delimiter=',') 
 for row in data :
-    print(row)
+    print(row) # 데이터 한 행씩 읽어오기 
 f.close() 
 
 
-# In[3]:
+# In[3]: next() 함수를 활용해 헤더 저장하기 
 
 
 import csv
@@ -31,7 +31,7 @@ import csv
 f =open('seoul.csv')
 data = csv.reader(f)
 header =next(data) # next()는 데이터 위치를 다음으로 이동...
-for row in data :
+for row in data : # 헤더 제외하고 출력 
     print(row)
 f.close()
 

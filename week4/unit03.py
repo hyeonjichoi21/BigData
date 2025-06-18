@@ -10,7 +10,7 @@ data = csv.reader(f) # !!! csv로 읽으면 모든 데이터 타입이 문자형
 header =next(data)
 for row in data :
     row[-1] = float(row[-1]) # 최고 기온을 "실수"로 변형, -1은 끝에서 첫번째=row[4]
-    #row[4] = float(row[4]) 
+    #row[4] = float(row[4]) # '최고 기온'이란 열은 실수로 변형 ㅋㅋ 이해 완 
     print(row)
 f.close()
 

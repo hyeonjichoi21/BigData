@@ -6,6 +6,7 @@ Created on Thu May 25 21:07:35 2023
 # OneHotEncoder ##############################################################################
 import numpy as np
 import pandas as pd
+import sklearn; print(sklearn._doc_);
 
 from sklearn.preprocessing import OneHotEncoder
 df = pd.DataFrame([
@@ -18,23 +19,28 @@ df = pd.DataFrame([
     [9,2,'male','C',13]
 ], columns=['hours', 'attendance', 'sex', 'cate', 'score'])
 df.info()
+print(df['cate'].unique())
 
-ohe = OneHotEncoder(sparse=False)
-ohe.fit(df[['sex']]) # Series encoding
+
+ohe = OneHotEncoder(sparse_output=False) # sparse=True
+ohe.fit(df[['sex']]) # Series encoding (Series를 원핫인코딩)
 encoding1=ohe.transform(df[['sex']]) # array of float64
 print(ohe.transform(df[['sex']]))
 
+# 밑에 것들도 원핫인코딩 하는 건데 무시하겠다. 
+
 array1=np.array(df[['sex']]) 
-ohe = OneHotEncoder(sparse=False)
+ohe = OneHotEncoder(sparse_output=False)
 ohe.fit(array1) # array encoding
 encoding1=ohe.transform(df[['sex']]) # array of float64
 print(ohe.transform(df[['sex']]))
 
-ohe = OneHotEncoder(sparse=False)
+ohe = OneHotEncoder(sparse_output=False)
 ohe.fit(df) # dataframe encoding
 encoding1=ohe.transform(df) # array of float64; dir(ohe); ohe.categories_; help(ohe.fit)
-print(ohe.transform(df[['sex']]))
+print(ohe.transform(df)); #print(ohe.transform(df[['sex']]))
 
+# 중간 뛰어넘고 여기부터 시작 
 ohe.fit(df[['cate']])
 cateencodeing=ohe.transform(df[['cate']])
 print(ohe.transform(df[['cate']]))
@@ -49,8 +55,10 @@ df = pd.DataFrame([
     [9,2,'C',13]
 ], columns=['hours', 'attendance', 'cate', 'score'])
 
+
+
 from sklearn.preprocessing import OneHotEncoder
-ohe = OneHotEncoder(sparse=False)
+ohe = OneHotEncoder(sparse_output=False)
 ohe.fit(df[['cate']])
 print(ohe.transform(df[['cate']]))
 
@@ -67,9 +75,9 @@ print(y_data)
 
 # LabelEncoder ##############################################################################
 import pandas as pd
-from sklearn import preprocessing
+from sklearn import preprocessing # 서열이 없으면 변수만드는게 원칙? 뭔소린지 모르겠다 ㅋ
 le = preprocessing.LabelEncoder()
-le.fit([1, 2, 2, 6])
+le.fit([1, 2, 2, 6]) 
 #LabelEncoder()
 le.classes_
 # array([1, 2, 6])

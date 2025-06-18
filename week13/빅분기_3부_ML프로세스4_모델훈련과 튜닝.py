@@ -52,31 +52,31 @@ plt.legend()
 # ## 7-3. Random Search
 # In[11]:
 # 랜덤서치를 위한 라이브러리 및 탐색 하이퍼파라미터 설정
-from sklearn.model_selection import RandomizedSearchCV
-from scipy.stats import randint
-param_distribs={'C': randint(low=0.001, high=100)}
+from sklearn.model_selection import GridSearchCV
+import numpy as np
+param_grid={'C': np.logspace(-3, 2, 10)}
 # In[12]:
 # LogisticRegression 알고리즘 적용
 from sklearn.linear_model import LogisticRegression
 # In[13]:
-# 랜덤서치를 로지스틱 모델에 적용하여 훈련데이터 학습
+# 그리드서치를 로지스틱 모델에 적용하여 훈련데이터 학습
 # 교차검증(cv) 5 설정, 훈련데이터 정확도 결과 제시하기(True)
-random_search=RandomizedSearchCV(LogisticRegression(), 
-                                 param_distributions=param_distribs, cv=5,
-                                 # n_iter=100, 랜덤횟수 디폴트=10
-                                return_train_score=True)
-random_search.fit(X_train, y_train)
+grid_search=GridSearchCV(LogisticRegression(), 
+                        param_grid=param_grid,
+                        cv=5,
+                        return_train_score=True)
+grid_search.fit(X_train, y_train)
 # In[14]:
 # 정확도가 가장 높은 하이퍼파라미터(C) 및 정확도 제시
-print("Best Parameter: {}".format(random_search.best_params_))
-print("Best Cross-validity Score: {:.3f}".format(random_search.best_score_))
+print("Best Parameter: {}".format(grid_search.best_params_))
+print("Best Cross-validity Score: {:.3f}".format(grid_search.best_score_))
 # In[15]:
 # 테스트 데이터에 최적 텀색 하이퍼 파라미터 적용 정확도 결과
-print("Test set Score: {:.3f}".format(random_search.score(X_test, y_test)))
+print("Test set Score: {:.3f}".format(grid_search.score(X_test, y_test)))
 # In[16]:
-# 랜덤서치 하이퍼파라미터별 상세 결과값
-result_random = random_search.cv_results_
-pd.DataFrame(result_random)
+# 그리드서치 하이퍼파라미터별 상세 결과값
+result_grid= grid_search.cv_results_
+pd.DataFrame(result_grid)
 # In[17]:
 # 하이퍼파리미터(C)값에 따른 훈련데이터와 테스트데이터의 정확도(accuracy) 그래프
 import matplotlib.pyplot as plt

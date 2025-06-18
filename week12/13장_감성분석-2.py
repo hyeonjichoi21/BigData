@@ -9,7 +9,7 @@ from datetime import datetime
 # ## ★★ 11장 결정트리분석에서 Pandas를 하위버전으로 설치하였으므로,  최신버전으로 업그레이드 설치한다. 
 # ### - Anaconda Prompt 를 [관리자권한으로 실행] 한 후에, 명령어 입력:  pip  install  --upgrade  pandas 
 # ###    -> 업그레이드 설치를 적용하기 위해서, Jupyter Notobook을 종료했다가 다시 실행하기 !!
-# 13장_감성분석.py 를 실행해 보고 싶은 학생은 다음과 같은 점을 체크한 다음 실행하지 바랍니다.
+# 13장_감성분석.py 를 실행해 보고 싶은 학생은 다음과 같은 점을 체크한 다음 실행하기 바랍니다.
 # (1) pandas 버전을 낮춘다. => pip install pandas==1.4.3
 # (2) pyLDAvis 버전을 맞춘다. => pip install pyLDAvis==3.4.0
 # (3) kernel을 새로 시작한다.
@@ -51,9 +51,11 @@ nsmc_train_df.info()
 nsmc_train_df['label'].value_counts()
 
 # #### (5) 한글 이외의 문자는 공백으로 변환 (정규표현식 이용)
-import re
+import re # 정규식 사용하기 위해 re 모듈을 임포트 
 
 nsmc_train_df['document'] = nsmc_train_df['document'].apply(lambda x : re.sub(r'[^ ㄱ-ㅣ가-힣]+', " ", x))
+# re.sub(r'[^ ㄱ-ㅣ가-힣]+', " ", x) : 괄호 안에 포함되지 않은 문자들을 제외한다는 의미입니다. " "(공백)으로 치환하겠다는 의미입니다.
+# 'ㄱ'으로 시작하거나 '가'부터 '힣'까지의 문자를 제외한 나머지는 공백으로 치환
 nsmc_train_df.head()
 
 # ### 2-2) 평가용 데이터 준비
@@ -79,10 +81,14 @@ nsmc_test_df['document'] = nsmc_test_df['document'].apply(lambda x : re.sub(r'[^
 # #### (1) 형태소를 분석하여 토큰화 : 한글 형태소 엔진으로 Okt 이용
 # get_ipython().system('pip install konlpy')
 
+# 형태소 분석에 사용할 konlpy 패키지의 Okt 클래스를 임포트
 from konlpy.tag import Okt
+# 그 후, okt 객체를 생성
 okt = Okt()
 
+# 문장을 토큰화하기 위해 okt_tokenizer 함수를 정의
 def okt_tokenizer(text):
+    # okt.morphs() 함수를 사용하여 형태소 단위로 토큰화 작업을 수행 
     tokens = okt.morphs(text)
     return tokens
 t2=datetime.now(); print(t2, t2-t1, '#### 1'); t1=t2
@@ -91,27 +97,45 @@ t2=datetime.now(); print(t2, t2-t1, '#### 1'); t1=t2
 # =================
 print('TF-IDF 기반 피처 벡터 생성 : 실행시간 20분 이상 걸립니다')
 t2=datetime.now(); print(t2, t2-t1, '#### 1'); t1=t2
+
+# 사이킷런의 TfidfVectorizer를 이용하여 TF-IDF 벡터화에 사용할 tfidf 객체를 생성 
 from sklearn.feature_extraction.text import TfidfVectorizer
+# 토큰 생성기는 우리가 정의한 okt_tokenizer() 함수로 설정하고, 토큰의 단어 크기 ngram_range는 1~2개 단어로 함
+# 토큰은 출현 빈도가 최소min_df 3번 이상이고, 최대 max_df 90% 이하인 것만 사용 
 tfidf = TfidfVectorizer(tokenizer = okt_tokenizer, ngram_range=(1,2), min_df=3, max_df=0.9)
+
 print(datetime.now())
 tfidf.fit(nsmc_train_df['document'])  # 여기서 기다림 
 print(datetime.now())
+
+# 벡터화할 데이터 nsmc_train_df['document']에 대해 벡터 모델 tfidf의 내부 설정값을 조정fit()하고 벡터로 변환을 수행transform()
 nsmc_train_tfidf = tfidf.transform(nsmc_train_df['document']) 
 print(datetime.now())
 t2=datetime.now(); print(t2, t2-t1, '#### 1'); t1=t2
+
+
 # ### 3-2) 감성 분류 모델 구축 : 로지스틱 회귀를 이용한 이진 분류
 # ### - Sentiment Analysis using Logistic Regression
 # #### (1) 로지스틱 회귀 기반 분석모델 생성
 
+# 머신 러닝의 로지스틱 회귀 모델을 이용하여 긍정과 부정의 감성 이진 분류 모델을 구축 
 from sklearn.linear_model import LogisticRegression
+# 사이킷런의 LogisticRegression 클래스에 대해 객체 SA_lr을 생성
 SA_lr = LogisticRegression(random_state = 0)
+# nsmc_train_tfidf를 독립변수 X로 하고, label 컬럼을 종속 변수 Y로 하여 
+# 로지스틱 회귀모델 SA_lr 내부 설정값을 조정fit()
 SA_lr.fit(nsmc_train_tfidf, nsmc_train_df['label'])
 
-# #### (2) 로지스틱 회귀의  best 하이퍼파라미터 찾기
 
+# #### (2) 로지스틱 회귀의  best 하이퍼파라미터 찾기
+# 로지스틱 회귀의 하이퍼 매개변수 C의 최적값을 구하기 위해 C값을 다르게 한 여러 모형을 만들고 실행하여 각 성능을 비교 (GridSearchCV 클래스 사용)
 from sklearn.model_selection import GridSearchCV
+
+# 하이퍼 매개변수 C에 대해 비교 검사를 할 6개 값 [1,3,3.5,4,4.5,5]을 params으로 하고, 교차 검증cv을 3, 모형 비교 기준은 정확도로 설정scoring=accuracy하여 GridSearchCV 객체를 생성
 params = {'C': [1, 3, 3.5, 4, 4.5, 5]}
 SA_lr_grid_cv = GridSearchCV(SA_lr, param_grid=params, cv=3, scoring='accuracy', verbose=1)
+
+# ★☆★☆★☆ 2025.06.13 여기까지 함 ppt 21쪽 까지 ~~ !! ☆★☆★☆★☆★☆★☆
 
 # #### (3) 최적 분석 모델 훈련
 print('최적 분석 모델 훈련 ... 1분 이상 소요..'); 

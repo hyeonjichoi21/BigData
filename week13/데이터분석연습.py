@@ -3,6 +3,7 @@ import pandas as pd
 x_train=pd.read_csv('x_train.csv', encoding='euckr')
 x_test=pd.read_csv('x_test.csv', encoding='euckr')
 y_train=pd.read_csv('y_train.csv', encoding='euckr')
+# y_test 는 없음 -> 이제 그걸 만들라 (?)
 
 x_train.head()
 y_train.head()
@@ -57,7 +58,7 @@ x=scaler.transform(x_test)
 x_test=pd.DataFrame(x, columns=x_test.columns)
 
 # 불필요한 컬럼 삭제
-x_train[['총구매액','최대구매액','환불금액_new']].corr()
+x_train[['총구매액','최대구매액','환불금액_new']].corr() # corr() 수치값?에 한해 상관관계 보는 거 ㅋ
 x_train.drop(columns=['최대구매액'], inplace=True)
 x_test.drop(columns=['최대구매액'], inplace=True)
 

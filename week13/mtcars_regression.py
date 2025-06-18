@@ -18,8 +18,8 @@ print(data['cyl'].unique())
 
 print(data.info())
 
-# print(data.corr())
-X=data.drop(columns='mpg')
+#print(data.corr())
+X=data.drop(columns='mpg') # mpg를 예측하고 싶은 거임 mpg는 연속형 데이터니까 (분류 X, 회귀O) (타겟 변수에 따라 분류가 되기도 ㅋ 회귀가 되기도 ㅋ)
 Y=data['mpg']
 
 # 필요없는 열 삭제 - 'Unnamed: 0' 자동차 이름
@@ -39,17 +39,14 @@ X['qsec']=X['qsec'].fillna(X_cyl_median)
 X=X.dropna()
 
 # 잘못된 값 바꾸기 '*3'->'3'
-X['gear']=X['gear'].astype(int); # <- 이 코드로 44번 오류 해결. 정수형으로 바꿔줘라!!
 print(X['gear'].unique())
-X['gear']=X['gear'].replace('*3', '3').replace('*5', '5')
-print(X.info());  # 이게 나와야 되는데, 안 나오는 상황
+X['gear']=X['gear'].replace('*3', '3').replace('*5', 5)
+print(X.info())
 
-# 'cyl' 최대치 이상값 처리 
-print(X['cyl'].unique())
-
+# 'cyl' 최대치 이상값 처리
 X_describe=X.describe()
 X_iqr=X_describe.loc['75%']-X_describe.loc['25%']
-X_iqrmax=X_describe.loc['75%']+(1.5*X_iqr) # 상한값 ??
+X_iqrmax=X_describe.loc['75%']+(1.5*X_iqr)
 X_cyl_list=X.index[X['cyl']>X_iqrmax['cyl']].tolist()
 X.loc[X_cyl_list, 'cyl']=X_iqrmax['cyl']
 
@@ -79,13 +76,12 @@ X.loc[30,'carb']=5.235
 #print(X.loc[outlier(X,'carb'), 'carb'])
 
 # 데이터 스케일링
-import sklearn
+import sklearn; 
 dir(sklearn)
 print(sklearn.__doc__)
 sklearn.__all__
-dir(sklearn.preprocessing)
+import sklearn.preprocessing; dir(sklearn.preprocessing)
 
-# 표준화 어쩌구? 한 번 코드 쭉 정독하기.. 흐름이랑 각 역할 파악!!
 from sklearn.preprocessing import StandardScaler
 scaler=StandardScaler()
 temp=X[['qsec']]
@@ -142,6 +138,8 @@ from sklearn.metrics import mean_absolute_error
 print(mean_absolute_error(y_test, y_test_predicted))
 from sklearn.metrics import mean_squared_error
 print(mean_squared_error(y_test, y_test_predicted))
+
+
 
 # random forest regressor
 from sklearn.ensemble import RandomForestRegressor

@@ -13,7 +13,7 @@ import pydotplus
 #conda install -c conda-forge pydotplus # get_ipython().system('pip install pydotplus')
 tennis_data = pd.read_csv('playtennis.csv')
 tennis_data
-# 범주형 변수 변경 
+# 범주형 변수 변경 https://lms.duksung.ac.kr/pluginfile.php/513625/mod_assign/intro/image.png
 # 값들을 다 숫자로 바꿔준다.
 tennis_data.Outlook = tennis_data.Outlook.replace('Sunny', 0)
 tennis_data.Outlook = tennis_data.Outlook.replace('Overcast', 1)
@@ -51,9 +51,16 @@ dt_prediction
 print(confusion_matrix(y_test, dt_prediction))
 print(classification_report(y_test, dt_prediction))
 
+
+
+y_test2 = N0, No, No, Yes, Yes, No, Yes, Yes, No, Yes
+y_prediction2 =  Yes,  No,Yes,Yes,Yes, No, Yes, Yes, Yes,No
+
 feature_names = tennis_data.columns.tolist()
 feature_names = feature_names[0:4]
 target_name = np.array(['Play No', 'Play Yes'])
+
+
 
 
 from sklearn.tree import plot_tree

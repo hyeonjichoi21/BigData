@@ -52,8 +52,8 @@ plt.legend()
 # In[11]:
 # 랜덤서치를 위한 라이브러리 및 탐색 하이퍼파라미터 설정
 from sklearn.model_selection import RandomizedSearchCV
-from scipy.stats import randint
-param_distribs={'C': randint(low=0.001, high=100)}
+from scipy.stats import uniform
+param_distribs={'C': uniform(0.001, 100)}
 # In[12]:
 # LogisticRegression 알고리즘 적용
 from sklearn.linear_model import LogisticRegression

@@ -57,5 +57,66 @@ if goods_no:
     print(f"[YES24] 리뷰 {len(reviews)}개 수집 완료!\n")
     for i, review in enumerate(reviews[:5]):
         print(f"{i+1}. {review}")
+
+    # ✅ 전처리 코드 여기서 시작
+    from konlpy.tag import Okt
+    import re
+
+    stopwords = ['의', '가', '이', '은', '들', '는', '좀', '잘', '걍', '과', '도', '를', '으로', '자', '에', '와', '한', '하다']
+    okt = Okt()
+
+    def preprocess_reviews(reviews):
+        processed = []
+        for review in reviews:
+            review = re.sub(r'[^가-힣\s]', '', review)
+            tokens = okt.morphs(review, stem=True)
+            tokens = [word for word in tokens if word not in stopwords and len(word) > 1]
+            processed.append(" ".join(tokens))
+        return processed
+
+    cleaned_reviews = preprocess_reviews(reviews)
+    print(f"\n[전처리된 리뷰 예시]\n")
+    for i, review in enumerate(cleaned_reviews[:5]):
+        print(f"{i+1}. {review}")
 else:
     print("책 링크가 잘못되었거나 상품번호 추출에 실패했습니다.")
+
+
+# GoodsReviewList
+# https://www.yes24.com/product/goods/115275383
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

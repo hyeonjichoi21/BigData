@@ -78,14 +78,37 @@ if goods_no:
     print(f"\n[전처리된 리뷰 예시]\n")
     for i, review in enumerate(cleaned_reviews[:5]):
         print(f"{i+1}. {review}")
+        
+    # ✅ 감성 분석 (간단 사전 기반)
+    senti_dict = {
+    "좋다": 2, "좋아": 2, "최고": 2, "만족": 2, "감동": 2, "추천": 2, "재미": 2, "재밌": 2,
+    "별로": -3, "실망": -3, "지루": -3, "비추": -3, "비추천":-3, "비추다": -3, "최악": -4, "불만": -2,
+    "아쉽": -2, "아깝": -2, "쓰레기": -5, "별점": -1, "후회": -3, "지저분": -3
+    }
+
+    def get_sentiment_score(review):
+        score = 0
+        for word in review.split():
+            score += senti_dict.get(word, 0)
+        return score
+
+    sentiment_results = [{"text": r, "score": get_sentiment_score(r)} for r in cleaned_reviews]
+
+    print("\n[감성 분석 결과 예시]")
+    for i, item in enumerate(sentiment_results[:5]):
+        label = "긍정" if item["score"] > 0 else "부정" if item["score"] < 0 else "중립"
+        print(f"{i+1}. ({label}) {item['text']}")
+
 else:
     print("책 링크가 잘못되었거나 상품번호 추출에 실패했습니다.")
 
 
 # GoodsReviewList
-# https://www.yes24.com/product/goods/115275383
-
-
+# 왜 나 너 사랑: https://www.yes24.com/product/goods/115275383
+# 표백: https://www.yes24.com/product/goods/93375712
+# 아몬드: https://www.yes24.com/product/goods/37300128
+# 난쏘공: https://www.yes24.com/product/goods/125020220
+# 망각일기: https://www.yes24.com/product/goods/115843545
 
 
 

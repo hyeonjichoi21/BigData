@@ -12,7 +12,7 @@ def extract_goods_no_from_url(url):
         print("❌ URL에서 상품번호를 추출할 수 없습니다.")
         return None
 
-# ✅ 리뷰 크롤링
+# ✅ 리뷰 본문 크롤링
 def crawl_yes24_reviews(goods_no, max_pages=10):
     reviews = []
     headers = {
@@ -44,6 +44,54 @@ def crawl_yes24_reviews(goods_no, max_pages=10):
         time.sleep(1)
 
     return reviews
+
+# ✅ 평점(별점) 크롤링
+def crawl_yes24_ratings(goods_no, max_pages=5):
+    ratings = []
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Referer": f"https://www.yes24.com/Product/Goods/{goods_no}",
+        "X-Requested-With": "XMLHttpRequest",
+    }
+
+    for page in range(1, max_pages + 1):
+        url = f"https://www.yes24.com/Product/communityModules/GoodsReviewList/{goods_no}?PageNumber={page}"
+        res = requests.get(url, headers=headers)
+        if res.status_code != 200:
+            print(f"❌ 요청 실패: {url}")
+            continue
+
+        soup = BeautifulSoup(res.text, "html.parser")
+        rating_spans = soup.select("span.total_rating")
+
+        if not rating_spans:
+            print(f"⚠️ {page}페이지에 평점 정보가 없습니다.")
+            continue
+
+        for span in rating_spans:
+            text = span.get_text(strip=True)  # 예: "평점2점"
+            match = re.search(r"평점(\d)점", text)
+            if match:
+                ratings.append(int(match.group(1)))
+
+        time.sleep(1)
+
+    return ratings
+
+# ✅ 컬러맵 선택 함수
+def get_colormap_by_rating(ratings):
+    if not ratings:
+        return "gray"
+    avg = sum(ratings) / len(ratings)
+    print(f"\n📊 평균 별점: {round(avg, 2)}점")
+    if avg >= 8:
+        return "Reds"
+    elif avg >= 6:
+        return "Oranges"
+    else:
+        return "Blues"
+
+
 
 
 # ✅ 실행부
@@ -78,7 +126,7 @@ if goods_no:
     for i, review in enumerate(cleaned_reviews[:5]):
         print(f"{i+1}. {review}")
 
-    # ✅ 감성 분석
+    # 감성 분석
     senti_dict = {
         "좋다": 2, "좋아": 2, "최고": 2, "만족": 2, "감동": 2, "추천": 2, "강추":4,
         "재미": 2, "꿀잼": 3, "재밌": 2, "명작": 5, "인생책": 6,
@@ -145,10 +193,10 @@ if goods_no:
     plt.figure(figsize=(10, 5))
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis('off')
-    plt.title(f"📚 감성 기반 WordCloud ({'긍정 우세' if pos_ratio > neg_ratio else '부정 우세'})")
+    plt.title(f" 감성 기반 WordCloud ({'긍정 우세' if pos_ratio > neg_ratio else '부정 우세'})")
     plt.show()
 
-    # ✅ 감정-색상 매핑 기반 WordCloud
+    # 감정-색상 매핑 기반 WordCloud
     emotion_color_map = {
         "사랑": "pink", "연애": "lightpink", "용기": "salmon", "공감": "lightcoral", "행복": "gold",
         "희망": "orange", "이해": "lightskyblue", "성장": "lightgreen", "이별": "skyblue", "우울증": "purple",
@@ -178,7 +226,31 @@ if goods_no:
     plt.figure(figsize=(10, 5))
     plt.imshow(emotion_wordcloud, interpolation='bilinear')
     plt.axis('off')
-    plt.title("🎨 감정 기반 색상 WordCloud")
+    plt.title(" 감정 기반 색상 WordCloud")
+    plt.show()
+    
+    
+    # ✅ 실행 후 리뷰 수집이 완료된 이후, 아래 코드 추가
+
+    # ⭐️ 별점 기반 WordCloud 추가
+    ratings = crawl_yes24_ratings(goods_no, max_pages=5)
+    print(f"\n[YES24] 평점 {len(ratings)}개 수집 완료!")
+    print("▶ 평점 예시:", ratings[:10])
+
+    colormap = get_colormap_by_rating(ratings)
+
+    wordcloud_rating_based = WordCloud(
+        font_path=font_path,
+        background_color='white',
+        width=800,
+        height=400,
+        colormap=colormap
+    ).generate_from_frequencies(tfidf_scores)
+
+    plt.figure(figsize=(10, 5))
+    plt.imshow(wordcloud_rating_based, interpolation='bilinear')
+    plt.axis('off')
+    plt.title(f" 별점 기반 WordCloud (컬러: {colormap})")
     plt.show()
 
 else:
@@ -188,16 +260,16 @@ else:
 
 
 # GoodsReviewList
-# 왜 나 너 사랑: https://www.yes24.com/product/goods/115275383
+# 왜 나 너 사랑: https://www.yes24.com/product/goods/115275383  O 
 # 표백: https://www.yes24.com/product/goods/93375712
 # 아몬드: https://www.yes24.com/product/goods/37300128
 # 난쏘공: https://www.yes24.com/product/goods/125020220
 # 망각일기: https://www.yes24.com/product/goods/115843545
-# 미움받을용기: https://www.yes24.com/product/goods/116599423
-# 파과: https://www.yes24.com/product/goods/125761518
+# 미움받을용기: https://www.yes24.com/product/goods/116599423 O 
+# 파과: https://www.yes24.com/product/goods/125761518 <- 얘로 테스트하기
 # 아가미: https://www.yes24.com/product/goods/125761510 <- 이건 결과 ㅂㄹ임 
-
-
+# 모순: https://www.yes24.com/product/goods/8759796
+# 나 소망 내게 금지: https://www.yes24.com/product/goods/72127217
 
 
 
